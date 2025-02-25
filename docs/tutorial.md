@@ -126,41 +126,54 @@ CMD ["npm", "run", "dev"]
 MSW をインストールし、モック API を準備。
 
 - **インストール**
+
   `bash npm install msw --save-dev `
+
 - **モックハンドラーファイル**
   (`src/mocks/handlers.ts`)
 
   ```typescript
-  import { rest } from "msw";
+  import { http, HttpResponse } from "msw";
   export const handlers = [
-    rest.post("/api/login", (req, res, ctx) => {
-      const { username, password } = req.body as {
+    http.post("/api/login", async ({ request }) => {
+      const body = await request.json();
+      const { username, password } = body as {
         username: string;
         password: string;
       };
+
       if (username === "test" && password === "password") {
-        return res(ctx.status(200), ctx.json({ token: "fake-token" }));
+        return HttpResponse.json({ token: "fake-token" }, { status: 200 });
       }
-      return res(ctx.status(401), ctx.json({ message: "Unauthorized" }));
-    }), // 書籍検索などのエンドポイントも追加可能です。
+      return HttpResponse.json(
+        { message: "Unauthorized" },
+        { statusText: "Unauthorized", status: 401 }
+      );
+    }),
+    // 書籍検索などのエンドポイントもここに追加可能
   ];
   ```
 
 - **ブラウザ用セットアップ**
   (`src/mocks/browser.ts`)
-  ```typescript
-  import { setupWorker } from "msw";
-  import { handlers } from "./handlers";
-  export const worker = setupWorker(...handlers);
-  ```
+
+```typescript
+import { setupWorker } from "msw/browser";
+import { handlers } from "./handlers";
+
+export const worker = setupWorker(...handlers);
+```
+
 - **起動設定**
   (`src/mocks/index.ts`)
+
   ```typescript
   import { worker } from "./browser";
   export function setupMocks() {
     worker.start();
   }
   ```
+
 - **Next.js のエントリーポイントで MSW を起動**
   (`src/pages/_app.tsx`)
 
@@ -175,6 +188,45 @@ MSW をインストールし、モック API を準備。
     return <Component {...pageProps} />;
   }
   export default MyApp;
+  ```
+
+- **Turbopack 由来と思われるモジュール解決エラーに対応**
+
+  - 参考 URL：https://github.com/mswjs/msw/issues/1801
+  - (`next.config.ts`)
+
+  ```ts
+  const nextConfig: NextConfig = {
+    /* config options here */
+    reactStrictMode: true,
+    webpack: (config, { isServer }) => {
+      if (isServer) {
+        // next server build => ignore msw/browser
+        if (Array.isArray(config.resolve.alias)) {
+          config.resolve.alias.push({
+            name: "msw/browser",
+            alias: false,
+          });
+        } else {
+          config.resolve.alias["msw/browser"] = false;
+        }
+      } else {
+        // browser => ignore msw/node
+        if (Array.isArray(config.resolve.alias)) {
+          config.resolve.alias.push({ name: "msw/node", alias: false });
+        } else {
+          config.resolve.alias["msw/node"] = false;
+        }
+      }
+      return config;
+    },
+  };
+  ```
+
+  - **Service Worker ファイルを生成**
+
+  ```bash
+  npx msw init public
   ```
 
 ## ステップ 2: ユーザー認証の UI と基本ロジックの実装
