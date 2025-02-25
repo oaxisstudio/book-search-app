@@ -1,0 +1,10 @@
+{
+  "name": "Next.js Book Search App",
+  "context": "..",
+  "dockerFile": "Dockerfile",
+  "appPort": [3000],
+  "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  }
+}

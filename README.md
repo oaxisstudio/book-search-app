@@ -2,19 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+このプロジェクトは、リモートコンテナでの開発を前提としている。
+VSCode の Remote Containers 拡張をインストールし、VSCode の左下の「＞＜」アイコン　または、コマンドパレット（Ctrl+Shift+P または Cmd+Shift+P）から「Remote-Containers: Reopen in Container」を選んで、プロジェクトをコンテナ内で再オープンする。
+
+### アプリケーションの起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いて、結果を確認する。
 
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
