@@ -13,3 +13,6 @@ export async function enableMocking() {
     onUnhandledRequest: "bypass",
   });
 }
+
+// テスト・サーバー環境用
+export { server } from "./server";
