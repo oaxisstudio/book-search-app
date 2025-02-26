@@ -9,10 +9,11 @@ export async function enableMocking() {
     return;
   }
 
+  const { worker } = await import("./browser");
   return worker.start({
     onUnhandledRequest: "bypass",
   });
 }
 
-// テスト・サーバー環境用
-export { server } from "./server";
+// サーバーサイドのモックは直接エクスポートしない
+// テストファイルで直接serverをインポートする
