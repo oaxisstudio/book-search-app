@@ -15,5 +15,22 @@ export const handlers = [
       { statusText: "Unauthorized", status: 401 }
     );
   }),
-  // 書籍検索などのエンドポイントもここに追加可能
+  http.get("/api/books", async ({ request }) => {
+    const query = new URL(request.url).searchParams.get("q");
+    if (query) {
+      return HttpResponse.json(
+        {
+          books: [
+            { id: 1, title: `「${query}」の本1` },
+            { id: 2, title: `「${query}」の本2` },
+          ],
+        },
+        { status: 200 }
+      );
+    }
+    return HttpResponse.json(
+      { message: "Bad Request" },
+      { statusText: "Bad Request", status: 400 }
+    );
+  }),
 ];
